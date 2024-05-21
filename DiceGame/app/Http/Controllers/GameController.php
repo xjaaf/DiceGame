@@ -66,7 +66,11 @@ class GameController extends Controller
      */
     public function index()
     {
-        //
+        $user = Auth::guard('api')->user();
+        return response()->json([
+            'message' => 'All games retrieved successfully',
+            'games' => $user->games,
+        ]);
     }
 
     /**
