@@ -9,11 +9,12 @@ use Illuminate\Support\Facades\Auth;
 
 class GameController extends Controller
 {
-    function createGame($user){
+    function createGame($user)
+    {
         $dice1 = rand(1, 6);
         $dice2 = rand(1, 6);
         $winner = false;
-        if($dice1 + $dice2 == 7){
+        if ($dice1 + $dice2 == 7) {
             $winner = true;
         }
 
@@ -23,60 +24,74 @@ class GameController extends Controller
             'winner' => $winner,
             'user_id' => $user->id
         ];
-
     }
 
     public function play()
-{
-    // Autenticar al usuario
-    $user = Auth::guard('api')->user();
-    if (!$user) {
-        return response()->json(['message' => 'Unauthorized'], 401);
+    {
+        // Autenticar al usuario
+        $user = Auth::guard('api')->user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        // Lanzar los dados
+        $dice1 = rand(1, 6);
+        $dice2 = rand(1, 6);
+        $total = $dice1 + $dice2;
+
+        // Determinar si es ganador
+        $isWinner = ($total == 7);
+
+        // Guardar el resultado en la base de datos
+        $game = Game::create([
+            'dice1' => $dice1,
+            'dice2' => $dice2,
+            'winner' => $isWinner,
+            'user_id' => $user->id
+        ]);
+
+        // Devolver la respuesta JSON
+        return response()->json([
+            'dice1' => 'First dice ' . $dice1,
+            'dice2' => 'Second dice ' . $dice2,
+            'total' => ' ' . $total,
+            'result' => $isWinner ? 'Congratulations, you won!' : 'Sorry, you lost!',
+            'message' => 'Game registered!',
+            'game' => $game,
+        ]);
     }
-
-    // Lanzar los dados
-    $dice1 = rand(1, 6);
-    $dice2 = rand(1, 6);
-    $total = $dice1 + $dice2;
-
-    // Determinar si es ganador
-    $isWinner = ($total == 7);
-
-    // Guardar el resultado en la base de datos
-    $game = Game::create([
-        'dice1' => $dice1,
-        'dice2' => $dice2,
-        'winner' => $isWinner,
-        'user_id' => $user->id
-    ]);
-
-    // Devolver la respuesta JSON
-    return response()->json([
-        'dice1' => 'First dice ' . $dice1,
-        'dice2' => 'Second dice ' . $dice2,
-        'total' => ' ' . $total,
-        'result' => $isWinner ? 'Congratulations, you won!' : 'Sorry, you lost!',
-        'message' => 'Game registered!',
-        'game' => $game,
-    ]);
-}
 
     /**
      * Display a listing of the resource.
      */
-    
+
     public function getAllGames($id)
-{
-    $userGames = Game::where('user_id', $id)->get();
+    {
+        $userGames = Game::where('user_id', $id)->get();
 
-    $gameCount = $userGames->count();
+        if ($userGames->isEmpty()) {
+            return response()->json([
+                'message' => 'You haven\'t made any plays yet',
+                'number_of_games' => 0,
+                'number_of_wins' => 0, 
+                'games' => [],
+            ]);
+        }
 
-    return response()->json([
-        'message' => 'All games retrieved successfully',
-        'number_of_games' => $gameCount,
-        'games' => $userGames,
-    ]);
-}
+        $gameCount = $userGames->count();
+
+        // Calcular el número de partidas ganadas
+        $numberOfWins = $userGames->where('isWon', true)->count();
+
+        return response()->json([
+            'message' => 'All games retrieved successfully',
+            'number_of_games' => $gameCount,
+            'number_of_wins' => $numberOfWins, // Nuevo: Incluir el número de partidas ganadas
+            'games' => $userGames,
+        ]);
+    }
+
+
 
 
     /**
@@ -110,6 +125,6 @@ class GameController extends Controller
     {
         Game::where('user_id', $id)->delete();
 
-        return response()->json(['message'=> 'All games deleted successfully!']);
+        return response()->json(['message' => 'All games deleted successfully!']);
     }
 }

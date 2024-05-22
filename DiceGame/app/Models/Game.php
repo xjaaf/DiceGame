@@ -15,4 +15,8 @@ class Game extends Model
         'dice2', 
         'winner', 
         'user_id'];
+
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
 }

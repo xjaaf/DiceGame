@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User; 
 use Illuminate\Support\Facades\Validator;
 use phpseclib3\Crypt\EC\Curves\nistb233;
+use Spatie\Permission\Models\Role;
+use App\Models\Game;
 
 class PlayerController extends Controller
 {
@@ -93,6 +95,34 @@ class PlayerController extends Controller
         ]);
     }
 
+    public function averageSuccessRate()
+    {
+        $players = User::whereHas('roles', function ($query) {
+                $query->where('name', 'player');
+            })
+            ->withCount(['games as games_played'])
+            ->withCount(['games as games_won' => function ($query) {
+                $query->where('winner', true);
+            }])
+            ->get()
+            ->each(function ($player) {
+                $player->average_success_rate = ($player->games_played > 0)
+                    ? round(($player->games_won / $player->games_played) * 100, 1)
+                    : 0;
+            });
+
+        $total_players = $players->count();
+        $total_average_success_rate = $players->avg('average_success_rate');
+
+        return response()->json([
+            'message' => 'Average success rate calculated successfully',
+            'total_players' => $total_players,
+            'total_average_success_rate' => $total_average_success_rate,
+            'players' => $players,
+        ]);
+    }
+
+    
     public function update(Request $request, $id)
 {
     $validator = Validator::make($request->all(), [
