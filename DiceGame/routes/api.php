@@ -6,6 +6,7 @@ use App\Http\Controllers\PlayerController;
 use App\Http\Controllers\GameController;
 use App\Http\Middleware\EnsureUserID;   
 
+
 Route::post('/player', [PlayerController::class, 'register']);
 Route::post('/player/login', [PlayerController::class, 'login']);
 Route::post('/player/logout', [PlayerController::class, 'logout']);
@@ -25,7 +26,10 @@ Route::middleware('auth:api', 'ensureUserID', 'role:player')->group(function () 
 });
 
 Route::middleware('auth:api', 'role:admin')->group(function () {
-    Route::get('/players', [PlayerController::class, 'index']);
+    
+    Route::get('/players', [PlayerController::class, 'averageSuccessRate']);
+    //Route::get('/players', [PlayerController::class, 'index']);
+
 });
 
 //Route::post('/game/play', [GameController::class, 'play']);
