@@ -66,11 +66,12 @@ class GameController extends Controller
      */
     public function index()
     {
-        $user = Auth::guard('api')->user();
-        return response()->json([
-            'message' => 'All games retrieved successfully',
-            'games' => $user->games,
-        ]);
+        $games = Game::all();
+
+    return response()->json([
+        'message' => 'All games retrieved successfully',
+        'games' => $games,
+    ]);
     }
 
     /**
@@ -102,6 +103,8 @@ class GameController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        Game::where('user_id', $id)->delete();
+
+        return response()->json(['message'=> 'All games deleted successfully!']);
     }
 }
