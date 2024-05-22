@@ -105,18 +105,32 @@ class PlayerController extends Controller
 }
 
 public function loserRanking()
-    {
-        $loser = User::withCount(['games as games_played', 'games as games_won' => function ($query) {
-                $query->where('winner', true);
-            }])
-            ->get()
-            ->sortBy('average_success_rate')
-            ->first();
+{
+    $loser = User::withCount(['games as games_played', 'games as games_won' => function ($query) {
+            $query->where('winner', true);
+        }])
+        ->get()
+        ->sortBy('average_success_rate')
+        ->first();
 
-        return $loser 
-            ? response()->json(['Worst Success Rate' => $loser], 200)
-            : response()->json(['message' => 'No players found'], 404);
-    }
+    return $loser 
+        ? response()->json(['Player with worst success rate' => $loser], 200)
+        : response()->json(['message' => 'No players found'], 404);
+}
+
+    public function winnerRanking()
+{
+    $winner = User::withCount(['games as games_won' => function ($query) {
+            $query->where('winner', true);
+        }])
+        ->orderByDesc('games_won')
+        ->first();
+
+    return $winner 
+        ? response()->json(['Player with most games won' => $winner], 200)
+        : response()->json(['message' => 'No players found'], 404);
+}
+
 
     public function destroy(string $id)
     {
