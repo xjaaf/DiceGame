@@ -64,15 +64,20 @@ class GameController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        $games = Game::all();
+    
+    public function getAllGames($id)
+{
+    $userGames = Game::where('user_id', $id)->get();
+
+    $gameCount = $userGames->count();
 
     return response()->json([
         'message' => 'All games retrieved successfully',
-        'games' => $games,
+        'number_of_games' => $gameCount,
+        'games' => $userGames,
     ]);
-    }
+}
+
 
     /**
      * Store a newly created resource in storage.

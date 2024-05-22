@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Models\User;
+use Spatie\Permission\Models\Role;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -32,6 +33,7 @@ class UserFactory extends Factory
             'password' => static::$password ??= Hash::make('12345'),
             'remember_token' => Str::random(10),
         ];
+        
     }
 
     /**
@@ -43,4 +45,5 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+    
 }

@@ -6,7 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class RoleSeeder extends Seeder
 {
@@ -16,28 +16,10 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         
-        DB::table('roles')->insert([
-            'name' => 'player',
-            'guard_name' => 'api'
-        ]);
-
-        DB::table('roles')->insert([
-            'name' => 'player',
-            'guard_name' => 'web'
-        ]);
-
-        DB::table('roles')->insert([
-            'name' => 'admin',
-            'guard_name' => 'api'
-        ]);
-
-        DB::table('roles')->insert([
-            'name' => 'admin',
-            'guard_name' => 'web'
-        ]);
-        
-
-
+        Role::updateOrCreate(['name' => 'player', 'guard_name' => 'api']);
+        Role::updateOrCreate(['name' => 'player', 'guard_name' => 'web']);
+        Role::updateOrCreate(['name' => 'admin', 'guard_name' => 'api']);
+        Role::updateOrCreate(['name' => 'admin', 'guard_name' => 'web']);
 
     }
 }
