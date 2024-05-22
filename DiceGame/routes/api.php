@@ -10,6 +10,7 @@ use App\Http\Middleware\EnsureUserID;
 Route::post('/player', [PlayerController::class, 'register']);
 Route::post('/player/login', [PlayerController::class, 'login']);
 Route::post('/player/logout', [PlayerController::class, 'logout']);
+Route::get('/players/ranking/loser', [PlayerController::class, 'loserRanking']);
 
 // Rutas protegidas por autenticación
 //Route::middleware('auth:api')->group(function () {
