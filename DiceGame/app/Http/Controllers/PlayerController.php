@@ -172,6 +172,11 @@ public function ranking()
 }
 public function averageSuccessRate()
 {
+    $user = Auth::guard('api')->user();
+    if (!$user) {
+        return response()->json(['message' => 'Unauthorized'], 401);
+    }
+
     $players = User::whereHas('roles', function ($query) {
             $query->where('name', 'player');
         })
