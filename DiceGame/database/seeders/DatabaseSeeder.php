@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 use App\Models\User;
+use App\Models\Game;
 use Spatie\Permission\Models\Role;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -17,9 +18,11 @@ class DatabaseSeeder extends Seeder
         $this->call([
             RoleSeeder::class,
             AdminSeeder::class,
+            
         ]);
 
         // Crear usuarios normales y asignarles el rol 'player'
+        $games = Game::factory(10)->create();
         $users = User::factory(10)->create();
         $playerRole = Role::where('name', 'player')->first();
 

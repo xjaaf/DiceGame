@@ -7,8 +7,8 @@ use App\Http\Controllers\GameController;
 use App\Http\Middleware\EnsureUserID;
 
 
-Route::post('/player', [PlayerController::class, 'register']);
-Route::post('/player/login', [PlayerController::class, 'login']);
+Route::post('/players', [PlayerController::class, 'register']);
+Route::post('/players/login', [PlayerController::class, 'login']);
 //Route::post('/player/logout', [PlayerController::class, 'logout']);
 //Route::get('/players/ranking/loser', [PlayerController::class, 'loserRanking']);
 //Route::get('/players/ranking/winner', [PlayerController::class, 'winnerRanking']);
@@ -30,10 +30,10 @@ Route::middleware('auth:api', 'role:player')->group(function () {
 
 
 Route::middleware('auth:api', 'ensureUserID', 'role:player')->group(function () {
-    Route::put('/player/{id}', [PlayerController::class, 'update']);
-    Route::post('/player/{id}/games/', [GameController::class, 'play']);
-    Route::delete('/player/{id}/games', [GameController::class, 'destroy']);
-    Route::get('/player/{id}/games', [GameController::class, 'getAllGames']);
+    Route::put('/players/{id}', [PlayerController::class, 'update']);
+    Route::post('/players/{id}/games/', [GameController::class, 'play']);
+    Route::delete('/players/{id}/games', [GameController::class, 'destroy']);
+    Route::get('/players/{id}/games', [GameController::class, 'getAllGames']);
 });
 
 Route::middleware('auth:api', 'role:admin')->group(function () {
