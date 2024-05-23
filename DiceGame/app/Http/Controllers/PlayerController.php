@@ -36,7 +36,7 @@ class PlayerController extends Controller
         'email' => $validatedData['email'],
         'password' => Hash::make($validatedData['password']),
     ]);
-
+    $user->assignRole('player');
     $token = $user->createToken('MyApp')->accessToken;
     return response()->json([
         'message' => 'User registered successfully',
