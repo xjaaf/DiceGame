@@ -27,39 +27,42 @@ class GameController extends Controller
     }
 
     public function play()
-    {
-        // Autenticar al usuario
-        $user = Auth::guard('api')->user();
-        if (!$user) {
-            return response()->json(['message' => 'Unauthorized'], 401);
-        }
-
-        // Lanzar los dados
-        $dice1 = rand(1, 6);
-        $dice2 = rand(1, 6);
-        $total = $dice1 + $dice2;
-
-        // Determinar si es ganador
-        $isWinner = ($total == 7);
-
-        // Guardar el resultado en la base de datos
-        $game = Game::create([
-            'dice1' => $dice1,
-            'dice2' => $dice2,
-            'winner' => $isWinner,
-            'user_id' => $user->id
-        ]);
-
-        // Devolver la respuesta JSON
-        return response()->json([
-            'dice1' => 'First dice ' . $dice1,
-            'dice2' => 'Second dice ' . $dice2,
-            'total' => ' ' . $total,
-            'result' => $isWinner ? 'Congratulations, you won!' : 'Sorry, you lost!',
-            'message' => 'Game registered!',
-            'game' => $game,
-        ]);
+{
+    // Autenticar al usuario
+    $user = Auth::guard('api')->user();
+    if (!$user) {
+        return response()->json(['message' => 'Unauthorized'], 401);
     }
+
+    // Lanzar los dados
+    $dice1 = rand(1, 6);
+    $dice2 = rand(1, 6);
+    $total = $dice1 + $dice2;
+
+    // Determinar si es ganador
+    $isWinner = ($total == 7);
+
+    // Guardar el resultado en la base de datos
+    $game = Game::create([
+        'dice1' => $dice1,
+        'dice2' => $dice2,
+        'winner' => $isWinner,
+        'user_id' => $user->id
+    ]);
+
+    // Devolver la respuesta JSON
+    return response()->json([
+        'welcome' => 'Welcome to the Dice Game!',
+        'dice1' => 'Your first dice is ' . $dice1,
+        'dice2' => 'Your second dice is ' . $dice2,
+        'total' => 'The total of your dice is ' . $total,
+        'result' => $isWinner ? 'Congratulations, you won!' : 'Sorry, you lost!',
+        'status' => 'success',
+        'message' => 'Your game has been registered successfully!',
+        'game' => $game,
+    ]);
+}
+
 
     /**
      * Display a listing of the resource.
