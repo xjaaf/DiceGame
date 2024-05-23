@@ -106,6 +106,11 @@ class PlayerController extends Controller
 
 public function loserRanking()
 {
+    $user = Auth::guard('api')->user();
+    if (!$user) {
+        return response()->json(['message' => 'Unauthorized'], 401);
+    }
+
     $loser = User::withCount(['games as games_played', 'games as games_won' => function ($query) {
             $query->where('winner', true);
         }])
@@ -120,6 +125,10 @@ public function loserRanking()
 
     public function winnerRanking()
 {
+    $user = Auth::guard('api')->user();
+    if (!$user) {
+        return response()->json(['message' => 'Unauthorized'], 401);
+    }
     $winner = User::withCount(['games as games_won' => function ($query) {
             $query->where('winner', true);
         }])
@@ -131,6 +140,68 @@ public function loserRanking()
         : response()->json(['message' => 'No players found'], 404);
 }
 
+
+public function ranking()
+{
+
+    $user = Auth::guard('api')->user();
+    if (!$user) {
+        return response()->json(['message' => 'Unauthorized'], 401);
+    }
+
+    $players = User::withCount(['games as games_played'])
+        ->withCount(['games as games_won' => function ($query) {
+            $query->where('winner', true);
+        }])
+        ->get()
+        ->each(function ($player) {
+            $player->average_success_rate = ($player->games_played > 0)
+                ? round(($player->games_won / $player->games_played) * 100, 1)
+                : 0;
+        });
+
+    $total_players = $players->count();
+    $total_average_success_rate = $players->avg('average_success_rate');
+
+    return response()->json([
+        'message' => 'Average success rate calculated successfully',
+        'total_players' => $total_players,
+        'total_average_success_rate' => $total_average_success_rate,
+        'players' => $players,
+    ]);
+}
+public function averageSuccessRate()
+{
+    $players = User::whereHas('roles', function ($query) {
+            $query->where('name', 'player');
+        })
+        ->withCount(['games as games_played'])
+        ->withCount(['games as games_won' => function ($query) {
+            $query->where('winner', true);
+        }])
+        ->get()
+        ->each(function ($player) {
+            $player->average_success_rate = ($player->games_played > 0)
+                ? round(($player->games_won / $player->games_played) * 100, 1)
+                : 0;
+        });
+
+    $total_players = $players->count();
+    $total_average_success_rate = $players->avg('average_success_rate');
+
+    // Obtener el porcentaje medio de cada jugador
+    $players->transform(function ($player) use ($total_average_success_rate) {
+        $player->player_average_success_rate = $total_average_success_rate;
+        return $player;
+    });
+
+    return response()->json([
+        'message' => 'Average success rate calculated successfully',
+        'total_players' => $total_players,
+        'total_average_success_rate' => $total_average_success_rate,
+        'players' => $players,
+    ]);
+}
 
     public function destroy(string $id)
     {
